@@ -10,6 +10,6 @@ $cfg['Servers'][$i]['port'] = '3306';
 $cfg['Servers'][$i]['user'] = 'lmidori';
 $cfg['Servers'][$i]['password'] = 'mypass';
 $cfg['Servers'][$i]['compress'] = false;
-$cfg['Sevrers'][$i]['AllowNoPassword'] = false;
+$cfg['Sevrers'][$i]['AllowNoPassword'] = true;
 $cfg['UploadDir'] = '';
 $cfg['SaveDir'] = '';
