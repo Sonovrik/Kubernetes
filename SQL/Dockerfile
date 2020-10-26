@@ -15,6 +15,7 @@ RUN apk add mysql mariadb-client
 
 # COPY SH_FILE
 COPY ./start_sql.sh ./
+COPY ./my.cnf /etc/my.cnf
 
 # PORT
 EXPOSE 3306

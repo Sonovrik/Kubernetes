@@ -18,7 +18,9 @@ COPY wp-config.php .
 RUN mkdir www
 RUN tar -xf ./wordpress-5.5.1.tar.gz -C ./www/
 RUN rm -rf wordpress-5.5.1.tar.gz
+RUN mv wp-config.php ./www/wordpress/
 
-EXPOSE 5050
 
 CMD [ "sh", "start_wp.sh" ]
+
+EXPOSE 5050

@@ -1,38 +1,23 @@
-# INSTALL ALPHINE LINUX
-FROM alpine:latest
+FROM alpine
 
-# UPDATE SOFTWARE
+# INSTALL SOFTWARE
 RUN apk update
-RUN apk add openssl
-RUN apk add bash
-RUN apk add openrc
-
-# INSTALL NGINX
 RUN apk add nginx
+RUN apk add openssl
+RUN apk add openrc
+RUN apk add openssh
+RUN apk add supervisor
 
-# CREATE FOLDER
-RUN mkdir /etc/nginx/ssl; mkdir -p /run/nginx/
-RUN chmod 700 /etc/ssl
-
-# COPY SOURCES
-COPY ./start_nginx.sh ./
-COPY ./nginx.conf ./
-
-# MOVE CONFIG
-RUN mv ./nginx.conf /etc/nginx/
-
-# CREATE USER AND USER FOULDER
+# ADD USER
 RUN adduser -D -g 'www' www
+RUN echo -e "mypass\nmypass\n" | adduser lmidori
+
+# CREATE FOLDERS
 RUN mkdir /www
 RUN chown -R www:www /var/lib/nginx
 RUN chown -R www:www /www
-
-# CREATE INDEX
-RUN echo "Hello world" > index.html
-RUN mv index.html ./www
-
-# DELETE DEFINE SETTINGS
-RUN rm -rf /etc/nginx/sites-enabled/default
+RUN mkdir /run/nginx
+RUN mkdir /etc/nginx/ssl
 
 # CREATE SSL KEYS
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -40,5 +25,20 @@ RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
    -out /etc/nginx/ssl/nginx-selfsigned.crt \
    -subj "/C=RU/ST=Moscow/L=Moscow/O=21/OU=school/CN=my_domain"
 
-# BASH
-CMD bash start_nginx.sh
+# START SERVICES
+RUN openrc default
+RUN rc-service sshd start
+RUN ssh-keygen -A
+RUN rc-service sshd stop
+
+# CREATE INDEX
+RUN echo "Hello world! This is NGINX !!!" > index.html
+RUN mv index.html ./www
+
+# COPY CONFIGS
+COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY  ./supervisord.conf /etc/supervisord.conf
+
+EXPOSE 80 443 22
+
+CMD [ "/usr/bin/supervisord", "-c", "etc/supervisord.conf" ]
